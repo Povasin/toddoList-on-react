@@ -6,10 +6,11 @@
     width: 95%;
     font-size: 20px;
 }
-.card{
+.card{ 
     display: flex;
     flex-direction: column;
     background-color: rgb(105, 219, 105);
+    /* дай обёртке, в которой карточки display:flex и тогда сможешь дать тут 100% в ширину */
     width: 95%;
     padding: 5px;
     margin: 20px 0;
@@ -22,6 +23,7 @@
     font-size: 18px;
     margin: 0;
 }
+/* Множественное число класса, так как у тебя там не одна функция */
 .function{
     display: flex;
     flex-direction: row;
@@ -42,9 +44,11 @@
     width: 80%;
     background-color: #D2D2D2;
 }
+/* Странно, что этот селектор объявлен здесь, вдалеке от селекторов, отвечающих за меню */
 .list{
     width: 20%;
 }
+/* Передалай под методолгию БЭМ, так как сейчас БЕДА */
 .nameContent{
     font-size: 30px;
     margin: 10px 20px;
@@ -53,6 +57,7 @@
     font-size: 20px;
     margin: 0 20px;
 }
+/* Тут лучше через id, так как кнопка добавить карточку уникальная */
 .add{
     cursor: pointer;
     font-size: 50px;
@@ -60,3 +65,6 @@
     margin-right: 10px;
     font-weight: 700;
 }
+
+
+/* P.S. все селекторы для карточки в меню тоже переделай под БЭМ, так как непонятно что к чему относится */
