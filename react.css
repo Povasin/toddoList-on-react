@@ -2,7 +2,12 @@
     display: flex;
     flex-direction: row;
 }
-.search{
+.menu{
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+}
+.menu__search{
     width: 95%;
     font-size: 20px;
 }
@@ -10,31 +15,30 @@
     display: flex;
     flex-direction: column;
     background-color: rgb(105, 219, 105);
-    /* дай обёртке, в которой карточки display:flex и тогда сможешь дать тут 100% в ширину */
     width: 95%;
     padding: 5px;
     margin: 20px 0;
 }
-.name{
+.card__name{
     font-size: 25px;
     margin: 10px 0;
 }
-.description{
+.card__description{
     font-size: 18px;
     margin: 0;
 }
 /* Множественное число класса, так как у тебя там не одна функция */
-.function{
+.card__function{
     display: flex;
     flex-direction: row;
     margin-left: auto;
 }
-.delete{
+.card__function__delete{
     font-size: 30px;
     margin-top: 17px;
     margin-bottom: 5px;
 }
-.redaction {
+.card__function__redaction {
     font-size: 20px;
     margin-left: 20px;
     margin-bottom: 5px;
@@ -44,21 +48,16 @@
     width: 80%;
     background-color: #D2D2D2;
 }
-/* Странно, что этот селектор объявлен здесь, вдалеке от селекторов, отвечающих за меню */
-.list{
-    width: 20%;
-}
-/* Передалай под методолгию БЭМ, так как сейчас БЕДА */
-.nameContent{
+
+.content__name{
     font-size: 30px;
     margin: 10px 20px;
 }
-.descriptionContent{
+.content__description{
     font-size: 20px;
     margin: 0 20px;
 }
-/* Тут лучше через id, так как кнопка добавить карточку уникальная */
-.add{
+#add{
     cursor: pointer;
     font-size: 50px;
     text-align: right;
@@ -66,5 +65,41 @@
     font-weight: 700;
 }
 
+#notify{
+    display: flex;
+    height: 400px;
+    background-color: rgb(255, 255, 255);
+    width: 40%;
+    position: fixed;
+    bottom: 0;
+    right: 18px;
+    border-radius: 20px;  
+    flex-direction: column;
+    transition: 1s;
+    font-size: 20px;
+    border: 1px solid black;
+}
+.notify__close{
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    border: none;
+    font-size: 20px;
+    color: black;
+    cursor: pointer;
+}
 
-/* P.S. все селекторы для карточки в меню тоже переделай под БЭМ, так как непонятно что к чему относится */
+input{
+    margin: 7px 10px;
+    width: 97%;
+    font-size: 18px;
+    background-color: #eeeefc;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    transition: 0.5s;
+    padding: 7px 0;
+}
+.false{
+    display: none;
+}
