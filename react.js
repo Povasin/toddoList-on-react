@@ -6,7 +6,7 @@ class Menu extends React.Component {
         return (
             <div className="menu">
                 <input type="text" placeholder="что ищите?" className="menu__search" />
-                <List menu__card={this.props.App__card} />
+                <List changeActiveCard={this.props.changeActiveCard} menu__card={this.props.App__card} />
                 <p id="add" onClick={() => this.props.card()}>+</p>
             </div>
         )
@@ -20,7 +20,7 @@ class List extends React.Component {
     render() {
         let list__card = this.props.menu__card.map((item) => {
             return(
-            <div className="card">
+            <div className="card" key={item.cardName} onClick={()=>this.props.changeActiveCard(item)}>
                 <p className="card__name" key={item.cardName}>{item.cardName}</p>
                 <p className="card__description" key={item.carddescription}>{item.carddescription}</p>
                 <div className="card__function">
@@ -43,19 +43,11 @@ class Content extends React.Component {
         super(props)
     }
     render() {
-        this.props.App__card.forEach(item => {
-            if (this.props.App__card.cardActive) {
-                return(
-                    <div>
-                        <p className="content__name" key={item.cardName}>{item.cardName}</p>
-                        <p className="content__description" key={item.carddescription}>{item.carddescription}</p>
-                    </div>
-                )
-            }
-        });
         return (
             // Для отображения инфы надо использовать пропсы, которые ты передашь из родительского компонента
             <div className="content">
+                <h1>{this.props.activeCard.cardName}</h1>
+                <p>{this.props.activeCard.carddescription}</p>
             </div>
         )
     }
@@ -66,25 +58,32 @@ class App extends React.Component {
         super(props)
         // состояние не прокатит такое, так как тебе надо где-то хранить все карточки, а тут только одна. Как вариант сделай два поля: массив из всех карточек внутри которого будут объекты (name, description), а также поле activeCard, который является объектом для передачи его в Content
         this.state = {
-            card: [
+            cards: [
                 {
                     cardName: "ботинок",
-                    carddescription: "купить ботинок",
-                    cardActive: true
+                    carddescription: "купить ботинок"
                 },
                 {
                     cardName: "бобер",
-                    carddescription: "купить а потом помыть бобра",
-                    cardActive: false
+                    carddescription: "купить а потом помыть бобра"
                 },
                 {
                     cardName: "мага",
-                    carddescription: "продать на рынке магу",
-                    cardActive: false
+                    carddescription: "продать на рынке магу"
                 },
             ],
+            activeCard: {
+                cardName: "ботинок",
+                carddescription: "купить ботинок",
+            },
             modal: false
         }
+    }
+
+    changeActiveCard = (card)=>{
+        this.setState({
+            activeCard: card
+        })
     }
     
     // addCard=()=> {
@@ -121,9 +120,9 @@ class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <Menu card={this.addCard} App__card={this.state.card} />
+                <Menu changeActiveCard={this.changeActiveCard} card={this.addCard} App__card={this.state.cards} />
                 {/* в контент передавай активную карточку для её отображения */}
-                <Content App__card={this.state.card}/>
+                <Content activeCard={this.state.activeCard}/>
             </div>
         )
     }
