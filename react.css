@@ -1,6 +1,8 @@
 .app{
     display: flex;
     flex-direction: row;
+    position: relative;
+    min-height: 100vh;
 }
 .menu{
     display: flex;
@@ -64,13 +66,13 @@
     margin-right: 10px;
     font-weight: 700;
 }
-
-#notify{
+.notify{
     display: flex;
-    height: 400px;
+    flex-direction: column;
+    height: 250px;
     background-color: rgb(255, 255, 255);
-    width: 40%;
-    position: fixed;
+    width: 20%;
+    position: absolute;
     bottom: 0;
     right: 18px;
     border-radius: 20px;  
@@ -80,12 +82,8 @@
     border: 1px solid black;
 }
 .notify__close{
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    border: none;
-    font-size: 20px;
-    color: black;
+    margin-left: auto;
+    margin-right: 20px;
     cursor: pointer;
 }
 
@@ -100,6 +98,9 @@ input{
     transition: 0.5s;
     padding: 7px 0;
 }
-.false{
-    display: none;
+
+.addBtn{
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: rgb(105, 219, 105);
 }

@@ -7,7 +7,7 @@ class Menu extends React.Component {
             <div className="menu">
                 <input type="text" placeholder="что ищите?" className="menu__search" />
                 <List changeActiveCard={this.props.changeActiveCard} menu__card={this.props.App__card} />
-                <p id="add" onClick={() => this.props.card()}>+</p>
+                <p id="add" onClick={() => this.props.addModal()}>+</p>
             </div>
         )
     }
@@ -44,7 +44,6 @@ class Content extends React.Component {
     }
     render() {
         return (
-            // Для отображения инфы надо использовать пропсы, которые ты передашь из родительского компонента
             <div className="content">
                 <h1>{this.props.activeCard.cardName}</h1>
                 <p>{this.props.activeCard.carddescription}</p>
@@ -53,10 +52,25 @@ class Content extends React.Component {
     }
 }
 
+class Modal extends React.Component{
+    constructor(props){
+        super(props)
+    }
+    render(){
+        return(
+            <div className="notify">
+                <p className="notify__close" onClick={()=>this.props.closeModal()}>X</p>
+                <input type="text" placeholder="название" className="notify__name" />
+                <input type="text" placeholder="описание" className="notify__description" />
+                <button className="addBtn">сохранить</button>
+            </div>
+        )
+   }
+}
+
 class App extends React.Component {
     constructor(props) {
         super(props)
-        // состояние не прокатит такое, так как тебе надо где-то хранить все карточки, а тут только одна. Как вариант сделай два поля: массив из всех карточек внутри которого будут объекты (name, description), а также поле activeCard, который является объектом для передачи его в Content
         this.state = {
             cards: [
                 {
@@ -86,43 +100,28 @@ class App extends React.Component {
         })
     }
     
-    // addCard=()=> {
-    //     if (!this.state.modal) {
-    //         this.setState({
-    //             modal: true
-    //         })
-    //         return (
-    //         <div className="notify">
-    //             <p className="notify__close" onClick={()=>closeCard()}>X</p>
-    //             <input type="text" placeholder="название" className="notify__name" />
-    //             <input type="text" placeholder="описание" className="notify__description" />
-    //             <button className="addBtn">сохранить</button>
-    //         </div>
-    //         )
-    //     }
-
-    // }
-    // closeCard=()=>{
-    //     if (this.state.modal) {
-    //         this.setState({
-    //             modal: true
-    //         })
-    //         return (
-    //             <div className="notify false">
-    //                 <p className="notify__close">X</p>
-    //                 <input type="text" placeholder="название" className="notify__name" />
-    //                 <input type="text" placeholder="описание" className="notify__description" />
-    //                 <button className="addBtn">сохранить</button>
-    //             </div>
-    //             )
-    //     }
-    // }
+    addModal=()=> {
+        if (!this.state.modal) {
+            this.state.cards.push({})
+            this.setState({
+                modal: true
+            })
+        }
+    }
+    closeModal=()=>{
+        if (this.state.modal) {
+            this.setState({
+                modal: false
+            })
+        }
+    }
+    
     render() {
         return (
             <div className="app">
-                <Menu changeActiveCard={this.changeActiveCard} card={this.addCard} App__card={this.state.cards} />
-                {/* в контент передавай активную карточку для её отображения */}
+                <Menu changeActiveCard={this.changeActiveCard} addModal={this.addModal} App__card={this.state.cards} />
                 <Content activeCard={this.state.activeCard}/>
+                {this.state.modal ? <Modal closeModal={this.closeModal}/> : null}
             </div>
         )
     }
