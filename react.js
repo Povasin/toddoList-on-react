@@ -6,7 +6,7 @@ class Menu extends React.Component {
         return (
             <div className="menu">
                 <input type="text" placeholder="что ищите?" className="menu__search" />
-                <List changeActiveCard={this.props.changeActiveCard} menu__card={this.props.App__card} />
+                <List changeActiveCard={this.props.changeActiveCard} cards={this.props.cards} />
                 <p id="add" onClick={() => this.props.addModal()}>+</p>
             </div>
         )
@@ -18,21 +18,21 @@ class List extends React.Component {
         super(props)
     }
     render() {
-        let list__card = this.props.menu__card.map((item) => {
+        let items = this.props.cards.map((item) => {
             return(
-            <div className="card" key={item.cardName} onClick={()=>this.props.changeActiveCard(item)}>
-                <p className="card__name" key={item.cardName}>{item.cardName}</p>
-                <p className="card__description" key={item.carddescription}>{item.carddescription}</p>
-                <div className="card__function">
-                    <p className="card__function__delete">X</p>
-                    <p className="card__function__redaction">ред</p>
+            <div className="card" key={item.name} onClick={()=>this.props.changeActiveCard(item)}>
+                <p className="card__name">{item.name}</p>
+                <p className="card__description">{item.description}</p>
+                <div className="card__functions">
+                    <p className="card__functionDelete">X</p>
+                    <p className="card__functionRedaction">ред</p>
                 </div>
             </div>
             )
         })
         return (
             <div>
-                {list__card}
+                {items}
             </div>
         )
     }
@@ -45,8 +45,8 @@ class Content extends React.Component {
     render() {
         return (
             <div className="content">
-                <h1>{this.props.activeCard.cardName}</h1>
-                <p>{this.props.activeCard.carddescription}</p>
+                <h1 className="content__name">{this.props.activeCard.name}</h1>
+                <p className="content__description">{this.props.activeCard.description}</p>
             </div>
         )
     }
@@ -74,21 +74,21 @@ class App extends React.Component {
         this.state = {
             cards: [
                 {
-                    cardName: "ботинок",
-                    carddescription: "купить ботинок"
+                    name: "ботинок",
+                    description: "купить ботинок"
                 },
                 {
-                    cardName: "бобер",
-                    carddescription: "купить а потом помыть бобра"
+                    name: "бобер",
+                    description: "купить а потом помыть бобра"
                 },
                 {
-                    cardName: "мага",
-                    carddescription: "продать на рынке магу"
+                    name: "мага",
+                    description: "продать на рынке магу"
                 },
             ],
             activeCard: {
-                cardName: "ботинок",
-                carddescription: "купить ботинок",
+                name: "ботинок",
+                description: "купить ботинок",
             },
             modal: false
         }
@@ -102,11 +102,15 @@ class App extends React.Component {
     
     addModal=()=> {
         if (!this.state.modal) {
-            this.state.cards.push({})
             this.setState({
-                modal: true
+                modal: true,
             })
         }
+    }
+    saveNewCard = ()=>{
+        let newCards = this.state.cards;
+        newCards.push({})
+        this.setState({cards: newCards})
     }
     closeModal=()=>{
         if (this.state.modal) {
@@ -119,7 +123,7 @@ class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <Menu changeActiveCard={this.changeActiveCard} addModal={this.addModal} App__card={this.state.cards} />
+                <Menu changeActiveCard={this.changeActiveCard} addModal={this.addModal} cards={this.state.cards} />
                 <Content activeCard={this.state.activeCard}/>
                 {this.state.modal ? <Modal closeModal={this.closeModal}/> : null}
             </div>
