@@ -6,8 +6,8 @@ class Menu extends React.Component {
         return (
             <div className="menu">
                 <input type="text" placeholder="что ищите?" className="menu__search" />
-                <List changeActiveCard={this.props.changeActiveCard} cards={this.props.cards} />
-                <p id="add" onClick={() => this.props.addModal()}>+</p>
+                <List changeActiveCard={this.props.changeActiveCard} cards={this.props.cards} removeCard={this.props.removeCard} />
+                <p id="add" onClick={() => this.props.showModal()}>+</p>
             </div>
         )
     }
@@ -24,11 +24,12 @@ class List extends React.Component {
                 <p className="card__name">{item.name}</p>
                 <p className="card__description">{item.description}</p>
                 <div className="card__functions">
-                    <p className="card__functionDelete">X</p>
+                    <p className="card__functionDelete" onClick={()=>this.props.removeCard(item)}>X</p>
                     <p className="card__functionRedaction">ред</p>
                 </div>
             </div>
             )
+
         })
         return (
             <div>
@@ -59,10 +60,10 @@ class Modal extends React.Component{
     render(){
         return(
             <div className="notify">
-                <p className="notify__close" onClick={()=>this.props.closeModal()}>X</p>
-                <input type="text" placeholder="название" className="notify__name" />
-                <input type="text" placeholder="описание" className="notify__description" />
-                <button className="addBtn">сохранить</button>
+                <p className="notify__close" onClick={()=>this.props.showModal()}>X</p>
+                <input type="text" placeholder="название" className="notify__name" valuename={this.props.valuename} onChange={this.props.handleChange} />
+                <input type="text" placeholder="описание" className="notify__description" valuedescription={this.props.valuedescription} onChange={this.props.handleChange} />
+                <button className="addBtn" onClick={()=>this.props.saveNewCard}>сохранить</button>
             </div>
         )
    }
@@ -90,8 +91,28 @@ class App extends React.Component {
                 name: "ботинок",
                 description: "купить ботинок",
             },
-            modal: false
+            modal: false,
+            valuename: '',
+            valuedescription: ''
         }
+        this.handleChange = this.handleChange.bind(this);
+        this.saveNewCard = this.saveNewCard.bind(this);
+    }
+    handleChange(event) {
+        this.setState({
+            valuename: event.target.valuename,
+            valuedescription: event.target.valuedescription
+        });
+      }
+      // удаление
+      //удаляет всегда первую карточку как решить
+    removeCard=(item)=>{
+        let removeCards = this.state.cards
+        removeCards.splice(item, 1)
+        this.setState({
+            cards: removeCards
+        }) 
+        console.log(removeCards);
     }
 
     changeActiveCard = (card)=>{
@@ -100,32 +121,35 @@ class App extends React.Component {
         })
     }
     
-    addModal=()=> {
+    showModal=()=> {
         if (!this.state.modal) {
             this.setState({
                 modal: true,
             })
-        }
-    }
-    saveNewCard = ()=>{
-        let newCards = this.state.cards;
-        newCards.push({})
-        this.setState({cards: newCards})
-    }
-    closeModal=()=>{
-        if (this.state.modal) {
+        } else if (this.state.modal) {
             this.setState({
                 modal: false
             })
         }
     }
+    // добавление 
+    // почему не работает? не готовое решение а обьеснить
+    saveNewCard(event){
+        let newCards = this.state.cards;
+        newCards.push({
+            name: this.state.valuename ,
+            description: this.state.valuedescription
+        })
+        this.setState({cards: newCards})
+        event.preventDefault();
+    }
     
     render() {
         return (
             <div className="app">
-                <Menu changeActiveCard={this.changeActiveCard} addModal={this.addModal} cards={this.state.cards} />
+                <Menu changeActiveCard={this.changeActiveCard} showModal={this.showModal} cards={this.state.cards} removeCard={this.removeCard} />
                 <Content activeCard={this.state.activeCard}/>
-                {this.state.modal ? <Modal closeModal={this.closeModal}/> : null}
+                {this.state.modal ? <Modal showModal={this.showModal} saveNewCard={this.saveNewCard} valuename={this.state.valuename} valuedescription={this.state.valuedescription} handleChange={this.handleChange}/> : null}
             </div>
         )
     }
