@@ -5,7 +5,7 @@ input{
     margin: 7px 10px;
     width: 97%;
     font-size: 18px;
-    background-color: #eeeefc;
+    background-color: #e3e3ff;
     border-radius: 10px;
     border: none;
     outline: none;
@@ -69,6 +69,9 @@ input{
     width: 80%;
     background-color: #D2D2D2;
     height: 100vh;
+}
+.card_active{
+    background-color: gray;
 }
 
 .content__name{
