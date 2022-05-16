@@ -5,12 +5,12 @@ class Menu extends React.Component {
     render() {
         return (
             <div className="menu">
-                <input type="text" placeholder="что ищите?" className="menu__search" />
+                <input type="text" placeholder="что ищите?" className="menu__search" value={this.props.valueSearch} onClick={() => this.props.search()} onChange={this.props.handleChangeSearch} />
                 <List
                     changeActiveCard={this.props.changeActiveCard}
                     cards={this.props.cards}
                     removeCard={this.props.removeCard}
-                    activeNumber = {this.props.activeNumber}
+                    activeNumber={this.props.activeNumber}
                 />
                 <p id="add" onClick={() => this.props.showModal()}>
                     +
@@ -30,10 +30,9 @@ class List extends React.Component {
     };
 
     render() {
-        let items = this.props.cards.map((item, index) => {
-            console.log(this.props.activeNumber);
+        const items = this.props.cards.map((item, index) => {
             return (
-                <div className={`card ${this.props.activeNumber==index?"card_active":null}`} key={item.name} onClick={() => this.props.changeActiveCard(item)}>
+                <div className={`card ${this.props.activeNumber == index ? "card_active" : null}`} key={item.name} onClick={() => this.props.changeActiveCard(item)}>
                     <p className="card__name">{item.name}</p>
                     <p className="card__description">{item.description}</p>
                     <div className="card__functions">
@@ -127,16 +126,23 @@ class App extends React.Component {
             modal: false,
             valuename: "",
             valuedescription: "",
+            valueSearch: ""
         };
     }
-    handleChangeName=(event)=> {
+    handleChangeName = (event) => {
         this.setState({
             valuename: event.target.value
         });
     }
-    handleChangeDescription=(e)=> {
+    handleChangeSearch = (event) => {
         this.setState({
-            valuedescription: e.target.value
+            valueSearch: event.target.value
+        });
+    }
+
+    handleChangeDescription = (event) => {
+        this.setState({
+            valuedescription: event.target.value
         });
     }
     removeCard = (index, item) => {
@@ -157,7 +163,20 @@ class App extends React.Component {
             activeCard: card,
         });
     };
+    // не коректно работает
+    search = () => {
+        const filterTasks = this.state.cards.filter((task) => {
+            if (task.name.indexOf(this.state.valueSearch) != -1) {
+                return true
+            } else {
+                return false
+            }
+        })
+        this.setState({
+            cards: filterTasks
+        })
 
+    }
     showModal = () => {
         if (!this.state.modal) {
             this.setState({
@@ -169,7 +188,7 @@ class App extends React.Component {
             });
         }
     };
-    saveNewCard=()=> {
+    saveNewCard = () => {
         let newCards = this.state.cards;
         newCards.push({
             name: this.state.valuename,
@@ -178,11 +197,11 @@ class App extends React.Component {
         this.setState({ cards: newCards });
     }
 
-    getActiveNumber =()=>{
+    getActiveNumber = () => {
         for (let i = 0; i < this.state.cards.length; i++) {
             if (this.state.cards[i].name == this.state.activeCard.name && this.state.cards[i].description == this.state.activeCard.description) {
                 return i
-            } 
+            }
         }
     }
 
@@ -194,8 +213,10 @@ class App extends React.Component {
                     showModal={this.showModal}
                     cards={this.state.cards}
                     removeCard={this.removeCard}
-                    activeNumber = {this.getActiveNumber()}
-                />
+                    activeNumber={this.getActiveNumber()}
+                    search={this.search}
+                    valueSearch={this.state.valueSearch}
+                    handleChangeSearch={this.handleChangeSearch} />
                 <Content activeCard={this.state.activeCard} />
                 {this.state.modal ? (
                     <Modal
