@@ -5,7 +5,13 @@ class Menu extends React.Component {
     render() {
         return (
             <div className="menu">
-                <input type="text" placeholder="что ищите?" className="menu__search" value={this.props.valueSearch} onClick={() => this.props.search()} onChange={this.props.handleChangeSearch} />
+                <input
+                    type="text"
+                    placeholder="что ищите?"
+                    className="menu__search"
+                    value={this.props.valueSearch}
+                    onChange={this.props.handleChangeSearch}
+                />
                 <List
                     changeActiveCard={this.props.changeActiveCard}
                     cards={this.props.cards}
@@ -32,7 +38,13 @@ class List extends React.Component {
     render() {
         const items = this.props.cards.map((item, index) => {
             return (
-                <div className={`card ${this.props.activeNumber == index ? "card_active" : null}`} key={item.name} onClick={() => this.props.changeActiveCard(item)}>
+                <div
+                    className={`card ${
+                        this.props.activeNumber == index ? "card_active" : ""
+                    }`}
+                    key={item.name}
+                    onClick={() => this.props.changeActiveCard(item)}
+                >
                     <p className="card__name">{item.name}</p>
                     <p className="card__description">{item.description}</p>
                     <div className="card__functions">
@@ -62,7 +74,9 @@ class Content extends React.Component {
         return (
             <div className="content">
                 <h1 className="content__name">{this.props.activeCard.name}</h1>
-                <p className="content__description">{this.props.activeCard.description}</p>
+                <p className="content__description">
+                    {this.props.activeCard.description}
+                </p>
             </div>
         );
     }
@@ -75,7 +89,10 @@ class Modal extends React.Component {
     render() {
         return (
             <div className="notify">
-                <p className="notify__close" onClick={() => this.props.showModal()}>
+                <p
+                    className="notify__close"
+                    onClick={() => this.props.showModal()}
+                >
                     X
                 </p>
                 <input
@@ -126,25 +143,25 @@ class App extends React.Component {
             modal: false,
             valuename: "",
             valuedescription: "",
-            valueSearch: ""
+            valueSearch: "",
         };
     }
     handleChangeName = (event) => {
         this.setState({
-            valuename: event.target.value
+            valuename: event.target.value,
         });
-    }
+    };
     handleChangeSearch = (event) => {
         this.setState({
-            valueSearch: event.target.value
+            valueSearch: event.target.value,
         });
-    }
+    };
 
     handleChangeDescription = (event) => {
         this.setState({
-            valuedescription: event.target.value
+            valuedescription: event.target.value,
         });
-    }
+    };
     removeCard = (index, item) => {
         let removeCards = this.state.cards;
         removeCards.splice(index, 1);
@@ -153,8 +170,8 @@ class App extends React.Component {
         });
         if (this.state.activeCard == item) {
             this.setState({
-                activeCard: this.state.cards[0]
-            })
+                activeCard: this.state.cards[0],
+            });
         }
     };
 
@@ -163,30 +180,15 @@ class App extends React.Component {
             activeCard: card,
         });
     };
-    // не коректно работает
     search = () => {
-        const filterTasks = this.state.cards.filter((task) => {
-            if (task.name.indexOf(this.state.valueSearch) != -1) {
-                return true
-            } else {
-                return false
-            }
-        })
-        this.setState({
-            cards: filterTasks
-        })
-
-    }
+        return this.state.cards.filter((task) =>
+            task.name.indexOf(this.state.valueSearch) != -1 ? true : false
+        );
+    };
     showModal = () => {
-        if (!this.state.modal) {
-            this.setState({
-                modal: true,
-            });
-        } else if (this.state.modal) {
-            this.setState({
-                modal: false,
-            });
-        }
+        this.setState({
+            modal: !this.state.modal,
+        });
     };
     saveNewCard = () => {
         let newCards = this.state.cards;
@@ -194,16 +196,25 @@ class App extends React.Component {
             name: this.state.valuename,
             description: this.state.valuedescription,
         });
-        this.setState({ cards: newCards });
-    }
+        this.setState({
+            cards: newCards,
+            modal: !this.state.modal,
+            valuename: "",
+            valuedescription: "",
+        });
+    };
 
     getActiveNumber = () => {
         for (let i = 0; i < this.state.cards.length; i++) {
-            if (this.state.cards[i].name == this.state.activeCard.name && this.state.cards[i].description == this.state.activeCard.description) {
-                return i
+            if (
+                this.state.cards[i].name == this.state.activeCard.name &&
+                this.state.cards[i].description ==
+                    this.state.activeCard.description
+            ) {
+                return i;
             }
         }
-    }
+    };
 
     render() {
         return (
@@ -211,12 +222,12 @@ class App extends React.Component {
                 <Menu
                     changeActiveCard={this.changeActiveCard}
                     showModal={this.showModal}
-                    cards={this.state.cards}
+                    cards={this.search()}
                     removeCard={this.removeCard}
                     activeNumber={this.getActiveNumber()}
-                    search={this.search}
+                    handleChangeSearch={this.handleChangeSearch}
                     valueSearch={this.state.valueSearch}
-                    handleChangeSearch={this.handleChangeSearch} />
+                />
                 <Content activeCard={this.state.activeCard} />
                 {this.state.modal ? (
                     <Modal
