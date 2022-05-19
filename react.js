@@ -17,6 +17,8 @@ class Menu extends React.Component {
                     cards={this.props.cards}
                     removeCard={this.props.removeCard}
                     activeNumber={this.props.activeNumber}
+                    redactionCards={this.props.redactionCards}
+                    edit={this.props.edit}
                 />
                 <p id="add" onClick={() => this.props.showModal()}>
                     +
@@ -39,9 +41,8 @@ class List extends React.Component {
         const items = this.props.cards.map((item, index) => {
             return (
                 <div
-                    className={`card ${
-                        this.props.activeNumber == index ? "card_active" : ""
-                    }`}
+                    className={`card ${this.props.activeNumber == index ? "card_active" : ""
+                        }`}
                     key={item.name}
                     onClick={() => this.props.changeActiveCard(item)}
                 >
@@ -57,7 +58,8 @@ class List extends React.Component {
                         >
                             X
                         </p>
-                        <p className="card__functionRedaction">ред</p>
+                        {this.props.edit && this.props.activeNumber == index ? <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>сохр</p> : <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>ред</p>}
+
                     </div>
                 </div>
             );
@@ -73,10 +75,9 @@ class Content extends React.Component {
     render() {
         return (
             <div className="content">
-                <h1 className="content__name">{this.props.activeCard.name}</h1>
-                <p className="content__description">
-                    {this.props.activeCard.description}
-                </p>
+                {!this.props.edit ? <div><h1 className="content__name">{this.props.activeCard.name}</h1> <p className="content__description">{this.props.activeCard.description}
+                </p></div> : <div><input value={this.props.activeCard.name} onChange={this.props.handleChangeEditName}/> <input value={this.props.activeCard.description} onChange={this.props.handleChangeEditdescription}/> </div> }
+
             </div>
         );
     }
@@ -144,6 +145,7 @@ class App extends React.Component {
             valuename: "",
             valuedescription: "",
             valueSearch: "",
+            edit: false,
         };
     }
     handleChangeName = (event) => {
@@ -162,6 +164,38 @@ class App extends React.Component {
             valuedescription: event.target.value,
         });
     };
+    handleChangeEditName = (event) => {
+        for (let i = 0; i < this.state.cards.length; i++) {
+            if (
+                this.state.cards[i].name == this.state.activeCard.name
+            ) {
+                this.setState(prevState =>({
+                    activeCard: {
+                        ...prevState.activeCard,
+                        name: event.target.value,
+                    },
+                    // как перезаписывать обьекты в массиве в setState
+                    // CardsNames: event.target.value
+                }))
+            }
+        }
+    }
+    handleChangeEditdescription = (event) => {
+        for (let i = 0; i < this.state.cards.length; i++) {
+            if (
+                this.state.cards[i].description == this.state.activeCard.description
+            ) {
+                this.setState(prevState =>({
+                    activeCard: {
+                        ...prevState.activeCard,
+                        description: event.target.value
+                    },
+                    // как перезаписывать обьекты в масиве
+                    // cards[i].name: event.target.value
+                }))
+            }
+        }
+    }
     removeCard = (index, item) => {
         let removeCards = this.state.cards;
         removeCards.splice(index, 1);
@@ -209,12 +243,16 @@ class App extends React.Component {
             if (
                 this.state.cards[i].name == this.state.activeCard.name &&
                 this.state.cards[i].description ==
-                    this.state.activeCard.description
+                this.state.activeCard.description
             ) {
                 return i;
             }
         }
     };
+    redactionCards = () => {
+        !this.state.edit ? this.setState({edit:!this.state.edit}) : this.setState({edit:!this.state.edit})
+    }
+
 
     render() {
         return (
@@ -227,8 +265,17 @@ class App extends React.Component {
                     activeNumber={this.getActiveNumber()}
                     handleChangeSearch={this.handleChangeSearch}
                     valueSearch={this.state.valueSearch}
+                    redactionCards={this.redactionCards}
+                    edit={this.state.edit}
+                    valueEditName={this.state.valueEditName}
                 />
-                <Content activeCard={this.state.activeCard} />
+                <Content activeCard={this.state.activeCard}
+                    edit={this.state.edit}
+                    valueEditName={this.state.valueEditName}
+                    handleChangeEditName={this.handleChangeEditName}
+                    handleChangeEditdescription={this.handleChangeEditdescription}
+                    valueEditDescription={this.state.valueEditDescription}
+                />
                 {this.state.modal ? (
                     <Modal
                         showModal={this.showModal}
