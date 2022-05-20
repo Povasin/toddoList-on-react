@@ -41,8 +41,9 @@ class List extends React.Component {
         const items = this.props.cards.map((item, index) => {
             return (
                 <div
-                    className={`card ${this.props.activeNumber == index ? "card_active" : ""
-                        }`}
+                    className={`card ${
+                        this.props.activeNumber == index ? "card_active" : ""
+                    }`}
                     key={item.name}
                     onClick={() => this.props.changeActiveCard(item)}
                 >
@@ -58,8 +59,21 @@ class List extends React.Component {
                         >
                             X
                         </p>
-                        {this.props.edit && this.props.activeNumber == index ? <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>сохр</p> : <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>ред</p>}
-
+                        {this.props.edit && this.props.activeNumber == index ? (
+                            <p
+                                className="card__functionRedaction"
+                                onClick={() => this.props.redactionCards()}
+                            >
+                                сохр
+                            </p>
+                        ) : (
+                            <p
+                                className="card__functionRedaction"
+                                onClick={() => this.props.redactionCards()}
+                            >
+                                ред
+                            </p>
+                        )}
                     </div>
                 </div>
             );
@@ -73,20 +87,44 @@ class Content extends React.Component {
         super(props);
     }
     render() {
-        return (
-            <div className="content">
-                {!this.props.edit ? <div><h1 className="content__name">{this.props.activeCard.name}</h1> <p className="content__description">{this.props.activeCard.description}
-                </p></div> : <div><input value={this.props.activeCard.name} onChange={this.props.handleChangeEditName}/> <input value={this.props.activeCard.description} onChange={this.props.handleChangeEditdescription}/> </div> }
-
-            </div>
-        );
+        if (!this.props.edit) {
+            return (
+                <div className="content">
+                    <h1 className="content__name">
+                        {this.props.activeCard.name}
+                    </h1>
+                    <p className="content__description">
+                        {this.props.activeCard.description}
+                    </p>
+                </div>
+            );
+        } else {
+            return (
+                <div className="content">
+                    <input
+                        value={this.props.activeCard.name}
+                        onChange={this.props.handleChangeEditName}
+                    />
+                    <input
+                        value={this.props.activeCard.description}
+                        onChange={this.props.handleChangeEditdescription}
+                    />
+                </div>
+            );
+        }
     }
 }
 
 class Modal extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            name: "",
+            description: "",
+        };
     }
+    // Создать новый метод, который соединит имя и описание и передаст его в saveNewCard
+
     render() {
         return (
             <div className="notify">
@@ -148,54 +186,63 @@ class App extends React.Component {
             edit: false,
         };
     }
+    // Эти два метода вынести в компонент Modal. Также перенести из этого компонента состояния valuename и valuedescription в компонент Modal
     handleChangeName = (event) => {
         this.setState({
             valuename: event.target.value,
         });
     };
-    handleChangeSearch = (event) => {
-        this.setState({
-            valueSearch: event.target.value,
-        });
-    };
-
     handleChangeDescription = (event) => {
         this.setState({
             valuedescription: event.target.value,
         });
     };
+    // Использовать его для сохранения новой карточки, но принимает в себя объект новой карточки
+    saveNewCard = () => {
+        let newCards = this.state.cards;
+        newCards.push({
+            name: this.state.valuename,
+            description: this.state.valuedescription,
+        });
+        this.setState({
+            cards: newCards,
+            modal: !this.state.modal,
+            valuename: "",
+            valuedescription: "",
+        });
+    };
     handleChangeEditName = (event) => {
         for (let i = 0; i < this.state.cards.length; i++) {
-            if (
-                this.state.cards[i].name == this.state.activeCard.name
-            ) {
-                this.setState(prevState =>({
-                    activeCard: {
-                        ...prevState.activeCard,
-                        name: event.target.value,
-                    },
-                    // как перезаписывать обьекты в массиве в setState
-                    // CardsNames: event.target.value
-                }))
+            if (this.state.cards[i].name == this.state.activeCard.name) {
+                const newCard = {
+                    name: event.target.value,
+                    description: this.state.activeCard.description,
+                };
+                let newMass = this.state.cards;
+                newMass.splice(i, 1, newCard);
+                this.setState({
+                    activeCard: newCard,
+                    cards: newMass,
+                });
             }
         }
-    }
+    };
     handleChangeEditdescription = (event) => {
         for (let i = 0; i < this.state.cards.length; i++) {
             if (
-                this.state.cards[i].description == this.state.activeCard.description
+                this.state.cards[i].description ==
+                this.state.activeCard.description
             ) {
-                this.setState(prevState =>({
+                this.setState((prevState) => ({
                     activeCard: {
                         ...prevState.activeCard,
-                        description: event.target.value
+                        description: event.target.value,
                     },
-                    // как перезаписывать обьекты в масиве
-                    // cards[i].name: event.target.value
-                }))
+                    // TODO: сделать как с именем
+                }));
             }
         }
-    }
+    };
     removeCard = (index, item) => {
         let removeCards = this.state.cards;
         removeCards.splice(index, 1);
@@ -214,27 +261,21 @@ class App extends React.Component {
             activeCard: card,
         });
     };
+    // Перенести эти два метода в компонент Menu. То есть теперь мы в Menu всегда передаём this.state.cards. А сама фильтрация карточек должна происходить в компоненте Menu
+    handleChangeSearch = (event) => {
+        this.setState({
+            valueSearch: event.target.value,
+        });
+    };
     search = () => {
         return this.state.cards.filter((task) =>
             task.name.indexOf(this.state.valueSearch) != -1 ? true : false
         );
     };
+    // Это тоже перенсти в Menu. Теперь Menu будет отвечать за открытие или закрытие модального окна
     showModal = () => {
         this.setState({
             modal: !this.state.modal,
-        });
-    };
-    saveNewCard = () => {
-        let newCards = this.state.cards;
-        newCards.push({
-            name: this.state.valuename,
-            description: this.state.valuedescription,
-        });
-        this.setState({
-            cards: newCards,
-            modal: !this.state.modal,
-            valuename: "",
-            valuedescription: "",
         });
     };
 
@@ -243,16 +284,17 @@ class App extends React.Component {
             if (
                 this.state.cards[i].name == this.state.activeCard.name &&
                 this.state.cards[i].description ==
-                this.state.activeCard.description
+                    this.state.activeCard.description
             ) {
                 return i;
             }
         }
     };
     redactionCards = () => {
-        !this.state.edit ? this.setState({edit:!this.state.edit}) : this.setState({edit:!this.state.edit})
-    }
-
+        this.setState({ 
+            edit: !this.state.edit 
+        });
+    };
 
     render() {
         return (
@@ -269,11 +311,14 @@ class App extends React.Component {
                     edit={this.state.edit}
                     valueEditName={this.state.valueEditName}
                 />
-                <Content activeCard={this.state.activeCard}
+                <Content
+                    activeCard={this.state.activeCard}
                     edit={this.state.edit}
                     valueEditName={this.state.valueEditName}
                     handleChangeEditName={this.handleChangeEditName}
-                    handleChangeEditdescription={this.handleChangeEditdescription}
+                    handleChangeEditdescription={
+                        this.handleChangeEditdescription
+                    }
                     valueEditDescription={this.state.valueEditDescription}
                 />
                 {this.state.modal ? (
