@@ -1,7 +1,20 @@
 class Menu extends React.Component {
     constructor(props) {
         super(props);
+        this.state ={
+            valueSearch: ""
+        }
     }
+    handleChangeSearch = (event) => {
+        this.setState({
+            valueSearch: event.target.value,
+        });
+    };
+    search = () => {
+        return this.props.cards.filter((task) =>
+            task.name.indexOf(this.state.valueSearch) != -1 ? true : false
+        );
+    };
     render() {
         return (
             <div className="menu">
@@ -9,12 +22,12 @@ class Menu extends React.Component {
                     type="text"
                     placeholder="что ищите?"
                     className="menu__search"
-                    value={this.props.valueSearch}
-                    onChange={this.props.handleChangeSearch}
+                    value={this.state.valueSearch}
+                    onChange={this.handleChangeSearch}
                 />
                 <List
                     changeActiveCard={this.props.changeActiveCard}
-                    cards={this.props.cards}
+                    cards={this.search()}
                     removeCard={this.props.removeCard}
                     activeNumber={this.props.activeNumber}
                     redactionCards={this.props.redactionCards}
@@ -119,12 +132,20 @@ class Modal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: "",
-            description: "",
+            valuename: "",
+            valuedescription: "",
         };
     }
-    // Создать новый метод, который соединит имя и описание и передаст его в saveNewCard
-
+    handleChangeName = (event) => {
+        this.setState({
+            valuename: event.target.value,
+        });
+    };
+    handleChangeDescription = (event) => {
+        this.setState({
+            valuedescription: event.target.value,
+        });
+    };
     render() {
         return (
             <div className="notify">
@@ -138,17 +159,17 @@ class Modal extends React.Component {
                     type="text"
                     placeholder="название"
                     className="notify__name"
-                    value={this.props.valuename}
-                    onChange={this.props.handleChangeName}
+                    value={this.state.valuename}
+                    onChange={this.handleChangeName}
                 />
                 <input
                     type="text"
                     placeholder="описание"
                     className="notify__description"
-                    value={this.props.valuedescription}
-                    onChange={this.props.handleChangeDescription}
+                    value={this.state.valuedescription}
+                    onChange={this.handleChangeDescription}
                 />
-                <button className="addBtn" onClick={this.props.saveNewCard}>
+                <button className="addBtn" onClick={()=>this.props.saveNewCard(this.state.valuename, this.state.valuedescription)}>
                     {" "}
                     сохранить{" "}
                 </button>
@@ -179,30 +200,14 @@ class App extends React.Component {
                 name: "ботинок",
                 description: "купить ботинок",
             },
-            modal: false,
-            valuename: "",
-            valuedescription: "",
-            valueSearch: "",
             edit: false,
         };
     }
-    // Эти два метода вынести в компонент Modal. Также перенести из этого компонента состояния valuename и valuedescription в компонент Modal
-    handleChangeName = (event) => {
-        this.setState({
-            valuename: event.target.value,
-        });
-    };
-    handleChangeDescription = (event) => {
-        this.setState({
-            valuedescription: event.target.value,
-        });
-    };
-    // Использовать его для сохранения новой карточки, но принимает в себя объект новой карточки
-    saveNewCard = () => {
+    saveNewCard = (valuename, valuedescription) => {
         let newCards = this.state.cards;
         newCards.push({
-            name: this.state.valuename,
-            description: this.state.valuedescription,
+            name: valuename,
+            description:valuedescription,
         });
         this.setState({
             cards: newCards,
@@ -233,13 +238,16 @@ class App extends React.Component {
                 this.state.cards[i].description ==
                 this.state.activeCard.description
             ) {
-                this.setState((prevState) => ({
-                    activeCard: {
-                        ...prevState.activeCard,
-                        description: event.target.value,
-                    },
-                    // TODO: сделать как с именем
-                }));
+                const newCard = {
+                    name: this.state.activeCard.name,
+                    description: event.target.value,
+                };
+                let newMass = this.state.cards;
+                newMass.splice(i, 1, newCard);
+                this.setState({
+                    activeCard: newCard,
+                    cards: newMass,
+                });
             }
         }
     };
@@ -261,18 +269,6 @@ class App extends React.Component {
             activeCard: card,
         });
     };
-    // Перенести эти два метода в компонент Menu. То есть теперь мы в Menu всегда передаём this.state.cards. А сама фильтрация карточек должна происходить в компоненте Menu
-    handleChangeSearch = (event) => {
-        this.setState({
-            valueSearch: event.target.value,
-        });
-    };
-    search = () => {
-        return this.state.cards.filter((task) =>
-            task.name.indexOf(this.state.valueSearch) != -1 ? true : false
-        );
-    };
-    // Это тоже перенсти в Menu. Теперь Menu будет отвечать за открытие или закрытие модального окна
     showModal = () => {
         this.setState({
             modal: !this.state.modal,
@@ -301,15 +297,13 @@ class App extends React.Component {
             <div className="app">
                 <Menu
                     changeActiveCard={this.changeActiveCard}
-                    showModal={this.showModal}
-                    cards={this.search()}
+                    cards={this.state.cards}
                     removeCard={this.removeCard}
                     activeNumber={this.getActiveNumber()}
-                    handleChangeSearch={this.handleChangeSearch}
-                    valueSearch={this.state.valueSearch}
                     redactionCards={this.redactionCards}
                     edit={this.state.edit}
                     valueEditName={this.state.valueEditName}
+                    showModal={this.showModal}
                 />
                 <Content
                     activeCard={this.state.activeCard}
@@ -325,10 +319,6 @@ class App extends React.Component {
                     <Modal
                         showModal={this.showModal}
                         saveNewCard={this.saveNewCard}
-                        valuename={this.state.valuename}
-                        valuedescription={this.state.valuedescription}
-                        handleChangeName={this.handleChangeName}
-                        handleChangeDescription={this.handleChangeDescription}
                     />
                 ) : null}
             </div>
