@@ -1,9 +1,9 @@
 class Menu extends React.Component {
     constructor(props) {
         super(props);
-        this.state ={
-            valueSearch: ""
-        }
+        this.state = {
+            valueSearch: "",
+        };
     }
     handleChangeSearch = (event) => {
         this.setState({
@@ -11,9 +11,7 @@ class Menu extends React.Component {
         });
     };
     search = () => {
-        return this.props.cards.filter((task) =>
-            task.name.indexOf(this.state.valueSearch) != -1 ? true : false
-        );
+        return this.props.cards.filter((task) => (task.name.indexOf(this.state.valueSearch) != -1 ? true : false));
     };
     render() {
         return (
@@ -29,7 +27,6 @@ class Menu extends React.Component {
                     changeActiveCard={this.props.changeActiveCard}
                     cards={this.search()}
                     removeCard={this.props.removeCard}
-                    activeNumber={this.props.activeNumber}
                     redactionCards={this.props.redactionCards}
                     edit={this.props.edit}
                 />
@@ -54,9 +51,7 @@ class List extends React.Component {
         const items = this.props.cards.map((item, index) => {
             return (
                 <div
-                    className={`card ${
-                        this.props.activeNumber == index ? "card_active" : ""
-                    }`}
+                    className={`card ${item.active ? "card_active" : ""}`}
                     key={item.name}
                     onClick={() => this.props.changeActiveCard(item)}
                 >
@@ -73,17 +68,11 @@ class List extends React.Component {
                             X
                         </p>
                         {this.props.edit && this.props.activeNumber == index ? (
-                            <p
-                                className="card__functionRedaction"
-                                onClick={() => this.props.redactionCards()}
-                            >
+                            <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>
                                 сохр
                             </p>
                         ) : (
-                            <p
-                                className="card__functionRedaction"
-                                onClick={() => this.props.redactionCards()}
-                            >
+                            <p className="card__functionRedaction" onClick={() => this.props.redactionCards()}>
                                 ред
                             </p>
                         )}
@@ -103,21 +92,14 @@ class Content extends React.Component {
         if (!this.props.edit) {
             return (
                 <div className="content">
-                    <h1 className="content__name">
-                        {this.props.activeCard.name}
-                    </h1>
-                    <p className="content__description">
-                        {this.props.activeCard.description}
-                    </p>
+                    <h1 className="content__name">{this.props.activeCard.name}</h1>
+                    <p className="content__description">{this.props.activeCard.description}</p>
                 </div>
             );
         } else {
             return (
                 <div className="content">
-                    <input
-                        value={this.props.activeCard.name}
-                        onChange={this.props.handleChangeEditName}
-                    />
+                    <input value={this.props.activeCard.name} onChange={this.props.handleChangeEditName} />
                     <input
                         value={this.props.activeCard.description}
                         onChange={this.props.handleChangeEditdescription}
@@ -149,10 +131,7 @@ class Modal extends React.Component {
     render() {
         return (
             <div className="notify">
-                <p
-                    className="notify__close"
-                    onClick={() => this.props.showModal()}
-                >
+                <p className="notify__close" onClick={() => this.props.showModal()}>
                     X
                 </p>
                 <input
@@ -169,7 +148,10 @@ class Modal extends React.Component {
                     value={this.state.valuedescription}
                     onChange={this.handleChangeDescription}
                 />
-                <button className="addBtn" onClick={()=>this.props.saveNewCard(this.state.valuename, this.state.valuedescription)}>
+                <button
+                    className="addBtn"
+                    onClick={() => this.props.saveNewCard(this.state.valuename, this.state.valuedescription)}
+                >
                     {" "}
                     сохранить{" "}
                 </button>
@@ -186,14 +168,17 @@ class App extends React.Component {
                 {
                     name: "ботинок",
                     description: "купить ботинок",
+                    active: true,
                 },
                 {
                     name: "бобер",
                     description: "купить а потом помыть бобра",
+                    active: false,
                 },
                 {
                     name: "мага",
                     description: "продать на рынке магу",
+                    active: false,
                 },
             ],
             activeCard: {
@@ -207,7 +192,7 @@ class App extends React.Component {
         let newCards = this.state.cards;
         newCards.push({
             name: valuename,
-            description:valuedescription,
+            description: valuedescription,
         });
         this.setState({
             cards: newCards,
@@ -234,10 +219,7 @@ class App extends React.Component {
     };
     handleChangeEditdescription = (event) => {
         for (let i = 0; i < this.state.cards.length; i++) {
-            if (
-                this.state.cards[i].description ==
-                this.state.activeCard.description
-            ) {
+            if (this.state.cards[i].description == this.state.activeCard.description) {
                 const newCard = {
                     name: this.state.activeCard.name,
                     description: event.target.value,
@@ -265,30 +247,30 @@ class App extends React.Component {
     };
 
     changeActiveCard = (card) => {
+        // получаешь новую активную карточку. Перезаписать весь cards с учётом новой карточки (то есть заменить где-то поле active на true)
+        const newCards = this.state.cards.map(item=>{
+            const active = item.name == card.name && item.description == card.description
+                return {
+                    name: item.name,
+                    description: item.description,
+                    active: active
+                }
+        })
         this.setState({
+            cards: newCards,
             activeCard: card,
         });
     };
+    
     showModal = () => {
         this.setState({
             modal: !this.state.modal,
         });
     };
 
-    getActiveNumber = () => {
-        for (let i = 0; i < this.state.cards.length; i++) {
-            if (
-                this.state.cards[i].name == this.state.activeCard.name &&
-                this.state.cards[i].description ==
-                    this.state.activeCard.description
-            ) {
-                return i;
-            }
-        }
-    };
     redactionCards = () => {
-        this.setState({ 
-            edit: !this.state.edit 
+        this.setState({
+            edit: !this.state.edit,
         });
     };
 
@@ -299,28 +281,18 @@ class App extends React.Component {
                     changeActiveCard={this.changeActiveCard}
                     cards={this.state.cards}
                     removeCard={this.removeCard}
-                    activeNumber={this.getActiveNumber()}
                     redactionCards={this.redactionCards}
                     edit={this.state.edit}
-                    valueEditName={this.state.valueEditName}
                     showModal={this.showModal}
                 />
                 <Content
                     activeCard={this.state.activeCard}
                     edit={this.state.edit}
-                    valueEditName={this.state.valueEditName}
                     handleChangeEditName={this.handleChangeEditName}
-                    handleChangeEditdescription={
-                        this.handleChangeEditdescription
-                    }
+                    handleChangeEditdescription={this.handleChangeEditdescription}
                     valueEditDescription={this.state.valueEditDescription}
                 />
-                {this.state.modal ? (
-                    <Modal
-                        showModal={this.showModal}
-                        saveNewCard={this.saveNewCard}
-                    />
-                ) : null}
+                {this.state.modal ? <Modal showModal={this.showModal} saveNewCard={this.saveNewCard} /> : null}
             </div>
         );
     }
